@@ -1,0 +1,19 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Brilho de Impacto Estilo HQ (Estrela de Fundo) -->
+  <path d="M100 20 L115 70 L170 60 L130 90 L180 140 L115 115 L100 180 L85 115 L20 140 L70 90 L30 60 L85 70 Z" fill="#fedf00" stroke="#000" stroke-width="2" />
+  
+  <!-- Luva de Boxe Verde -->
+  <path d="M60 110 C60 70, 140 70, 140 110 C140 130, 130 150, 100 150 C70 150, 60 130, 60 110 Z" fill="#009b3a" stroke="#000" stroke-width="3" />
+  
+  <!-- Polegar da Luva -->
+  <path d="M60 110 C40 110, 40 140, 70 145" fill="none" stroke="#000" stroke-width="3" />
+  
+  <!-- Círculo Azul da Bandeira no Centro -->
+  <circle cx="100" cy="110" r="25" fill="#002776" stroke="white" stroke-width="2" />
+  
+  <!-- Faixa Branca (Ordem e Progresso Style) -->
+  <path d="M78 115 Q100 100 122 115" fill="none" stroke="white" stroke-width="2" />
+  
+  <!-- Estrela de Brilho no Impacto -->
+  <polygon points="115,95 118,105 128,105 120,112 123,122 115,115 107,122 110,112 102,105 112,105" fill="white" />
+</svg>
