@@ -5,7 +5,7 @@
       <div 
         v-for="char in characters" 
         :key="char.id" 
-        :class="['char-card', { selected: selectedId === char.id }]"
+        :class="['char-card', { selected: selectedId === char.id, 'animate-select': selectedId === char.id }]"
         @click="selectChar(char.id)"
       >
         <img :src="char.imageUrl" :alt="char.name" />
@@ -25,6 +25,7 @@
 import { onMounted, ref } from 'vue';
 import { characterApi } from '../api/client';
 import { getSocket } from '../socket';
+import Swal from 'sweetalert2';
 
 const props = defineProps(['matchId']);
 const emit = defineEmits(['character-confirmed']);
@@ -38,6 +39,11 @@ const loadCharacters = async () => {
     characters.value = data;
   } catch (err) {
     console.error('Erro ao carregar personagens');
+    Swal.fire({
+      icon: 'error',
+      title: 'Erro',
+      text: 'Erro ao carregar personagens',
+    });
   }
 };
 
@@ -48,11 +54,22 @@ const selectChar = (id) => {
 };
 
 const createTestCharacter = async () => {
-  if (!newName.value) return alert('Dê um nome ao herói!');
-  
+  if (!newName.value) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Aviso',
+      text: 'Dê um nome ao herói!',
+    });
+    return;
+  }
+
   // Como o backend exige um arquivo real via multer, vamos usar um mock ou alertar
   // Para simplificar, vou assumir que você vai criar via Postman ou eu crio uma rota de semente depois
-  alert('Funcionalidade de upload requer um arquivo. Por favor, use um personagem já existente ou adicione um via API.');
+  Swal.fire({
+    icon: 'info',
+    title: 'Informação',
+    text: 'Funcionalidade de upload requer um arquivo. Por favor, use um personagem já existente ou adicione um via API.',
+  });
 };
 
 const confirmSelection = () => {
@@ -64,7 +81,11 @@ const confirmSelection = () => {
     if (res.ok) {
       emit('character-confirmed');
     } else {
-      alert(res.reason || 'Erro ao selecionar personagem');
+      Swal.fire({
+        icon: 'error',
+        title: 'Erro',
+        text: res.reason || 'Erro ao selecionar personagem',
+      });
     }
   });
 };
@@ -77,4 +98,14 @@ const confirmSelection = () => {
 .char-card img { width: 100px; height: 100px; object-fit: cover; border-radius: 50%; }
 .char-card.selected { border-color: #42b983; background: #e7f9f1; }
 .ready-btn { margin-top: 20px; padding: 10px 20px; background: #42b983; color: white; border: none; border-radius: 4px; font-weight: bold; }
+.error-message { color: red; margin: 10px 0; }
+.animate-select {
+  animation: selectAnimation 0.5s ease;
+}
+
+@keyframes selectAnimation {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
 </style>

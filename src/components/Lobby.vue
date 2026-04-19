@@ -8,6 +8,7 @@
       </div>
     </div>
 
+
     <div class="lists">
       <div class="card online-card">
         <h3>Lutadores Online</h3>
@@ -60,6 +61,7 @@
 import { onMounted, ref, onUnmounted, computed } from 'vue';
 import { socketState, getSocket } from '../socket';
 import { matchApi } from '../api/client';
+import Swal from 'sweetalert2';
 
 const props = defineProps(['myUserId']);
 const emit = defineEmits(['match-joined']);
@@ -115,16 +117,28 @@ const createMatch = async () => {
       maxPlayers: 2
     });
     currentMatchId.value = data.matchId;
-    alert('Sala criada! Agora clique em "Desafiar!" ao lado do nome de alguém.');
+    Swal.fire({
+      icon: 'success',
+      title: 'Sala criada!',
+      text: 'Agora clique em "Desafiar!" ao lado do nome de alguém.',
+    });
   } catch (err) {
-    alert('Erro ao criar partida');
+    Swal.fire({
+      icon: 'error',
+      title: 'Erro',
+      text: 'Erro ao criar partida',
+    });
   }
 };
 
 const invitePlayer = (userId) => {
   const socket = getSocket();
   socket.emit('invite:send', { toUserId: userId, matchId: currentMatchId.value });
-  alert('Desafio enviado! Aguarde o oponente aceitar.');
+  Swal.fire({
+    icon: 'info',
+    title: 'Desafio enviado!',
+    text: 'Aguarde o oponente aceitar.',
+  });
 };
 
 const acceptInvite = (inviteId) => {
@@ -137,6 +151,8 @@ const acceptInvite = (inviteId) => {
 .lobby-container { max-width: 1000px; margin: 0 auto; padding: 20px; color: #fff; }
 .lobby-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 2px solid #42b983; padding-bottom: 15px; }
 .header-btns { display: flex; gap: 10px; }
+
+.error-message { color: #ff4d4d; background: #330000; border: 1px solid #ff4d4d; border-radius: 6px; padding: 10px; margin-bottom: 20px; }
 
 .lists { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 .card { background: #1a1a1a; border: 1px solid #333; border-radius: 12px; padding: 20px; min-height: 300px; }

@@ -26,6 +26,7 @@
 import { ref, reactive } from 'vue';
 import { authApi } from '../api/client';
 import { setAuthSession, setUserProfile } from '../utils/storage.js';
+import Swal from 'sweetalert2';
 
 const emit = defineEmits(['auth-success']);
 const isLogin = ref(true);
@@ -59,11 +60,21 @@ const handleSubmit = async () => {
       emit('auth-success', data.data.accessToken);
     } else {
       await authApi.register(form);
-      alert('Registro concluído! Agora faça login.');
+      // Use SweetAlert2 to show success message
+      Swal.fire({
+        icon: 'success',
+        title: 'Registro concluído!',
+        text: 'Agora faça login.',
+      });
       isLogin.value = true;
     }
   } catch (err) {
-    alert(err.response?.data?.error?.message || 'Erro na autenticação');
+    // Use SweetAlert2 to show error message
+    Swal.fire({
+      icon: 'error',
+      title: 'Erro',
+      text: err.response?.data?.error?.message || 'Erro na autenticação',
+    });
   }
 };
 </script>

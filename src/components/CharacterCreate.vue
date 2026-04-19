@@ -30,6 +30,7 @@
 <script setup>
 import { ref } from 'vue';
 import { characterApi } from '../api/client';
+import Swal from 'sweetalert2';
 
 const emit = defineEmits(['cancel', 'created']);
 const name = ref('');
@@ -55,10 +56,18 @@ const handleSubmit = async () => {
 
   try {
     await characterApi.create(formData);
-    alert('Lutador criado com sucesso!');
+    Swal.fire({
+      icon: 'success',
+      title: 'Sucesso!',
+      text: 'Lutador criado com sucesso!',
+    });
     emit('created');
   } catch (err) {
-    alert(err.response?.data?.error || 'Erro ao criar lutador. Verifique se o nome já existe.');
+    Swal.fire({
+      icon: 'error',
+      title: 'Erro',
+      text: err.response?.data?.error || 'Erro ao criar lutador. Verifique se o nome já existe.',
+    });
   } finally {
     loading.value = false;
   }
@@ -77,4 +86,5 @@ button { padding: 10px 20px; border-radius: 4px; cursor: pointer; border: none; 
 .save-btn { background: #42b983; color: white; }
 .cancel-btn { background: #eee; color: #333; }
 button:disabled { opacity: 0.5; cursor: not-allowed; }
+.error-message { color: red; margin-top: 10px; }
 </style>

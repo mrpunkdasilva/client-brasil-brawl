@@ -50,9 +50,6 @@
           Voltar
         </button>
       </div>
-
-      <p v-if="error" class="error-msg">{{ error }}</p>
-      <p v-if="success" class="success-msg">{{ success }}</p>
     </form>
   </div>
 </template>
@@ -60,6 +57,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { userApi } from '../api/client';
+import Swal from 'sweetalert2';
 
 const emit = defineEmits(['close', 'updated']);
 
@@ -70,8 +68,6 @@ const formData = ref({
 const avatarFile = ref(null);
 const avatarPreview = ref(null);
 const loading = ref(false);
-const error = ref('');
-const success = ref('');
 
 const fetchProfile = async () => {
   try {
@@ -79,7 +75,11 @@ const fetchProfile = async () => {
     userProfile.value = response.data;
     formData.value.username = response.data.username;
   } catch (err) {
-    error.value = 'Erro ao carregar perfil.';
+    Swal.fire({
+      icon: 'error',
+      title: 'Erro',
+      text: 'Erro ao carregar perfil.',
+    });
   }
 };
 
@@ -93,8 +93,6 @@ const handleFileChange = (event) => {
 
 const handleSubmit = async () => {
   loading.value = true;
-  error.value = '';
-  success.value = '';
 
   try {
     const data = new FormData();
@@ -106,17 +104,29 @@ const handleSubmit = async () => {
     }
 
     if (data.entries().next().done) {
-      success.value = 'Nenhuma alteração detectada.';
+      Swal.fire({
+        icon: 'info',
+        title: 'Informação',
+        text: 'Nenhuma alteração detectada.',
+      });
       loading.value = false;
       return;
     }
 
     const response = await userApi.updateProfile(data);
     userProfile.value = response.data;
-    success.value = 'Perfil atualizado com sucesso!';
+    Swal.fire({
+      icon: 'success',
+      title: 'Sucesso!',
+      text: 'Perfil atualizado com sucesso!',
+    });
     emit('updated', response.data);
   } catch (err) {
-    error.value = err.response?.data?.error || 'Erro ao atualizar perfil.';
+    Swal.fire({
+      icon: 'error',
+      title: 'Erro',
+      text: err.response?.data?.error || 'Erro ao atualizar perfil.',
+    });
   } finally {
     loading.value = false;
   }

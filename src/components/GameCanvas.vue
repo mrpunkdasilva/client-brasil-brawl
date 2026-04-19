@@ -123,8 +123,32 @@ const winnerName = computed(() => {
 const keys = { up: false, down: false, left: false, right: false };
 const mousePos = { x: 0, y: 0 };
 const isShooting = ref(false);
+const canShoot = ref(true);
+const hitPlayers = ref(new Set()); // Track players hit this frame
 
 const imageCache = new Map();
+
+const lineCircleIntersection = (lineStart, lineEnd, circleCenter, circleRadius) => {
+  const dx = lineEnd.x - lineStart.x;
+  const dy = lineEnd.y - lineStart.y;
+  const fx = lineStart.x - circleCenter.x;
+  const fy = lineStart.y - circleCenter.y;
+
+  const a = dx * dx + dy * dy;
+  if (a === 0) return false; // Line start and end are the same
+
+  const b = 2 * (fx * dx + fy * dy);
+  const c = fx * fx + fy * fy - circleRadius * circleRadius;
+
+  const discriminant = b * b - 4 * a * c;
+  if (discriminant < 0) return false;
+
+  const sqrtD = Math.sqrt(discriminant);
+  const t1 = (-b - sqrtD) / (2 * a);
+  const t2 = (-b + sqrtD) / (2 * a);
+
+  return (t1 >= 0 && t1 <= 1) || (t2 >= 0 && t2 <= 1);
+};
 
 const getPlayerImage = (imageUrl) => {
   if (!imageUrl) return null;
@@ -185,13 +209,16 @@ const sendInput = () => {
     }
   });
 
-  if (isShooting.value) {
+  if (isShooting.value && canShoot.value) {
     socket.emit('match:input', {
       matchId: props.matchId,
       seq: ++inputSeq.value,
       action: 'shoot',
       payload: { direction: angle }
     });
+    canShoot.value = false; // Prevents continuous shooting
+  } else {
+    canShoot.value = true; // Allows shooting again
   }
 };
 
@@ -220,6 +247,31 @@ const render = () => {
     requestAnimationFrame(render);
     return;
   }
+
+  // Reset hit players each frame
+  hitPlayers.value.clear();
+
+  // Detect collisions between projectiles and players (square collision)
+  const playerSize = 36; // Assuming square bounding box of 36x36 pixels
+
+  lastSnapshot.value.projectiles.forEach(prj => {
+    lastSnapshot.value.players.forEach(p => {
+      if (!p.isAlive) return;
+      if (p.playerId === prj.ownerPlayerId) return; // Don't hit self
+
+      // Check if projectile is within player's square bounding box
+      const halfSize = playerSize / 2;
+      const left = p.position.x - halfSize;
+      const right = p.position.x + halfSize;
+      const top = p.position.y - halfSize;
+      const bottom = p.position.y + halfSize;
+
+      if (prj.position.x >= left && prj.position.x <= right &&
+          prj.position.y >= top && prj.position.y <= bottom) {
+        hitPlayers.value.add(p.playerId);
+      }
+    });
+  });
 
   // Projéteis
   ctx.fillStyle = '#ffff00';
@@ -269,6 +321,20 @@ const render = () => {
     ctx.fillRect(p.position.x - 25 * scale, p.position.y - 35 * scale, 50 * scale, 6);
     ctx.fillStyle = p.hp > 50 ? '#42b983' : p.hp > 25 ? '#ffaa00' : '#ff4444';
     ctx.fillRect(p.position.x - 25 * scale, p.position.y - 35 * scale, (p.hp / 100) * 50 * scale, 6);
+
+    // Hit visualization - bright white circle around hit player
+    if (hitPlayers.value.has(p.playerId)) {
+      ctx.strokeStyle = 'rgba(255, 255, 100, 0.9)';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(p.position.x, p.position.y, 25 * scale, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Optional: add hit indicator text
+      ctx.fillStyle = 'rgba(255, 255, 100, 0.9)';
+      ctx.font = 'bold 12px Arial';
+      ctx.fillText('HIT!', p.position.x, p.position.y + 40 * scale);
+    }
   });
 
   requestAnimationFrame(render);
@@ -283,6 +349,9 @@ onMounted(() => {
       console.log('Snapshot recebido:', snapshot);
       lastSnapshot.value = snapshot;
       if (snapshot.status === 'finished') matchEnded.value = true;
+      // Check if player has active projectile
+      const hasProjectile = snapshot.projectiles.some(prj => prj.ownerPlayerId === props.myUserId);
+      if (!hasProjectile) canShoot.value = true;
     });
     socket.on('match:ended', () => {
       matchEnded.value = true;
