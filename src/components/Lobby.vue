@@ -121,6 +121,7 @@ onUnmounted(() => {
   if (socket) {
     socket.off('invite:accepted', handleInviteAccepted);
   }
+  socketState.invites = [];
 });
 
 const createMatch = async () => {
@@ -158,6 +159,7 @@ const invitePlayer = (userId) => {
 const acceptInvite = (inviteId) => {
   const socket = getSocket();
   socket.emit('invite:accept', { inviteId });
+  socketState.invites = socketState.invites.filter(i => i.inviteId !== inviteId);
 };
 </script>
 
