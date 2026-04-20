@@ -182,3 +182,51 @@ input {
   outline: none;
   letter-spacing: 2px;
 }
+
+/* SweetAlert2 Pixel-Art Style */
+.swal2-popup {
+  background-color: var(--surface-color) !important;
+  border: 4px solid black !important;
+  box-shadow: 8px 8px 0px 0px black !important;
+  border-radius: 0 !important;
+  font-family: var(--font-mono) !important;
+  image-rendering: pixelated !important;
+}
+
+.swal2-title {
+  font-family: var(--font-pixel) !important;
+  color: var(--brazil-yellow) !important;
+  font-size: 0.8rem !important;
+  text-transform: uppercase !important;
+  text-shadow: 2px 2px 0px black !important;
+  line-height: 1.5 !important;
+}
+
+.swal2-html-container {
+  color: var(--text-primary) !important;
+  font-size: 1.2rem !important;
+  letter-spacing: 1px !important;
+}
+
+.swal2-confirm, .swal2-cancel {
+  border: 3px solid black !important;
+  border-radius: 0 !important;
+  font-family: var(--font-pixel) !important;
+  font-size: 0.6rem !important;
+  text-transform: uppercase !important;
+  padding: 10px 20px !important;
+  box-shadow: inset -3px -3px 0px 0px rgba(0,0,0,0.3) !important;
+}
+
+.swal2-confirm {
+  background-color: var(--brazil-green) !important;
+}
+
+.swal2-cancel {
+  background-color: var(--danger) !important;
+}
+
+.swal2-icon {
+  border-width: 4px !important;
+  image-rendering: pixelated !important;
+}
