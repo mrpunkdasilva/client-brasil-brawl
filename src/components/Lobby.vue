@@ -92,12 +92,26 @@ const handleInviteAccepted = (data) => {
   emit('match-joined', data.matchId);
 };
 
-onMounted(() => {
+const joinLobby = () => {
   const socket = getSocket();
-  if (socket) {
+  if (socket && socket.connected) {
     socket.emit('lobby:join', {}, (res) => {
       if (res.ok) socketState.onlineUsers = res.data.users;
     });
+  } else if (socket) {
+    // If socket exists but not yet connected, wait for it
+    socket.once('connect', () => {
+      socket.emit('lobby:join', {}, (res) => {
+        if (res.ok) socketState.onlineUsers = res.data.users;
+      });
+    });
+  }
+};
+
+onMounted(() => {
+  const socket = getSocket();
+  if (socket) {
+    joinLobby();
     socket.on('invite:accepted', handleInviteAccepted);
   }
 });

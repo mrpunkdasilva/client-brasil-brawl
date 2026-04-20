@@ -82,6 +82,7 @@ const handleAuthSuccess = (token) => {
   user.value = { id: payload.sub, username: payload.name };
   connectSocket(token);
   view.value = 'LOBBY';
+  window.history.pushState({}, '', '/lobby');
 };
 
 const handleProfileUpdated = (updatedUser) => {
@@ -91,10 +92,12 @@ const handleProfileUpdated = (updatedUser) => {
 const handleMatchJoined = (id) => {
   matchId.value = id;
   view.value = 'CHAR_SELECT';
+  window.history.pushState({}, '', `/match/${id}`);
 };
 
 const handleCharacterCreated = () => {
   view.value = 'LOBBY';
+  window.history.pushState({}, '', '/lobby');
 };
 
 const logout = () => {
@@ -102,14 +105,43 @@ const logout = () => {
   user.value = null;
   disconnectSocket();
   view.value = 'AUTH';
+  window.history.pushState({}, '', '/login');
 };
 
 onMounted(() => {
   // Try to restore session from secure storage
   const authSession = getAuthSession();
   if (authSession && authSession.accessToken) {
-    handleAuthSuccess(authSession.accessToken);
+    const payload = parseJwt(authSession.accessToken);
+    user.value = { id: payload.sub, username: payload.name };
+    connectSocket(authSession.accessToken);
+
+    // Deep linking logic
+    const path = window.location.pathname;
+    if (path.startsWith('/match/')) {
+      matchId.value = path.split('/')[2];
+      view.value = 'CHAR_SELECT'; // Go to selection first!
+    } else if (path === '/lobby') {
+      view.value = 'LOBBY';
+    } else {
+      view.value = 'LOBBY';
+      window.history.replaceState({}, '', '/lobby');
+    }
+  } else {
+    view.value = 'AUTH';
+    window.history.replaceState({}, '', '/login');
   }
+
+  // Handle browser back/forward buttons
+  window.onpopstate = () => {
+    const path = window.location.pathname;
+    if (path === '/login') view.value = 'AUTH';
+    else if (path === '/lobby') view.value = 'LOBBY';
+    else if (path.startsWith('/match/')) {
+      matchId.value = path.split('/')[2];
+      view.value = 'ARENA';
+    }
+  };
 });
 </script>
 
