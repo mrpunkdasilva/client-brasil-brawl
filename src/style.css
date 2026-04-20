@@ -24,8 +24,8 @@
   --font-mono: 'VT323', monospace;
 
   font-family: var(--font-mono);
-  font-size: 18px;
-  line-height: 1.2;
+  font-size: 18px; /* Balanced base size */
+  line-height: 1.6; /* Increased for better spacing */
   letter-spacing: 2px;
   color: var(--text-primary);
   background-color: var(--bg-color);
@@ -102,6 +102,7 @@ h1, h2, h3 {
   color: var(--brazil-yellow);
   text-shadow: 2px 2px 0px #000;
   letter-spacing: 3px;
+  line-height: 1.5; /* Generous spacing for headers */
 }
 
 h1 { font-size: 1.2rem; }

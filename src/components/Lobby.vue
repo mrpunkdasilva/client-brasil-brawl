@@ -1,7 +1,10 @@
 <template>
   <div class="lobby-container">
     <div class="lobby-header">
-      <h2>Sala de Espera - {{ socketState.onlineUsers.length }} online</h2>
+      <div class="header-info">
+        <h2>Sala de Espera - {{ socketState.onlineUsers.length }} online</h2>
+        <span class="max-players-info">LIMITE: 64 LUTADORES POR ARENA</span>
+      </div>
       <div class="header-btns">
         <button @click="createMatch" class="primary">Criar Nova Partida</button>
         <button @click="refreshOnlineList" class="secondary">Atualizar Lista</button>
@@ -129,7 +132,7 @@ const createMatch = async () => {
     const { data } = await matchApi.create({
       name: `Arena de Desafio`,
       password: '123',
-      maxPlayers: 2
+      maxPlayers: 64
     });
     currentMatchId.value = data.matchId;
     Swal.fire({
@@ -178,7 +181,7 @@ const acceptInvite = (inviteId) => {
   padding: 1.25rem;
   background-color: var(--surface-color);
   border: 3px solid black;
-  box-shadow: 4px 4px 0px 0px black;
+  box-shadow: 4px 4px 0px black;
   flex-wrap: wrap;
   gap: 1.5rem;
 }
@@ -198,6 +201,22 @@ const acceptInvite = (inviteId) => {
   .lists {
     grid-template-columns: 1fr !important;
   }
+}
+
+.header-info {
+  display: flex;
+  flex-direction: column;
+  gap: 12px; /* Increased from 5px */
+  flex: 1;
+}
+
+.max-players-info {
+  font-family: var(--font-pixel);
+  font-size: 0.45rem;
+  color: var(--brazil-yellow);
+  opacity: 0.9;
+  letter-spacing: 1px;
+  margin-top: 2px;
 }
 
 .lobby-header h2 {
