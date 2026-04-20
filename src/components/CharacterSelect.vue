@@ -92,20 +92,91 @@ const confirmSelection = () => {
 </script>
 
 <style scoped>
-.character-select { text-align: center; padding: 20px; }
-.characters-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 15px; margin: 20px 0; }
-.char-card { border: 2px solid transparent; padding: 10px; cursor: pointer; transition: 0.3s; }
-.char-card img { width: 100px; height: 100px; object-fit: cover; border-radius: 50%; }
-.char-card.selected { border-color: #42b983; background: #e7f9f1; }
-.ready-btn { margin-top: 20px; padding: 10px 20px; background: #42b983; color: white; border: none; border-radius: 4px; font-weight: bold; }
-.error-message { color: red; margin: 10px 0; }
+.character-select {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+h3 {
+  font-size: 1rem;
+  color: var(--text-primary);
+  margin-bottom: 2.5rem;
+  line-height: 1.6;
+}
+
+.characters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+.char-card {
+  background-color: var(--surface-color);
+  border: 4px solid black;
+  padding: 1.5rem;
+  cursor: pointer;
+  box-shadow: 4px 4px 0px 0px black;
+  transition: transform 0.1s;
+}
+
+.char-card:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px 0px black;
+  border-color: var(--brazil-green);
+}
+
+.char-card img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border: 4px solid black;
+  margin-bottom: 1rem;
+  image-rendering: pixelated;
+}
+
+.char-card p {
+  margin: 0;
+  font-family: var(--font-pixel);
+  font-size: 0.6rem;
+  color: var(--text-secondary);
+}
+
+.char-card.selected {
+  border-color: var(--brazil-yellow);
+  background-color: rgba(254, 223, 0, 0.1);
+  box-shadow: 8px 8px 0px 0px black;
+  transform: translate(-4px, -4px);
+}
+
+.char-card.selected img {
+  border-color: var(--brazil-yellow);
+}
+
+.char-card.selected p {
+  color: var(--brazil-yellow);
+}
+
+.ready-btn {
+  margin-top: 3rem;
+  padding: 1.5rem 3rem;
+  font-size: 1rem;
+}
+
 .animate-select {
-  animation: selectAnimation 0.5s ease;
+  animation: selectAnimation 0.2s steps(2);
 }
 
 @keyframes selectAnimation {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); }
+  0% { transform: translate(-2px, -2px); }
+  100% { transform: translate(-4px, -4px); }
+}
+
+.empty-state {
+  padding: 3rem;
+  border: 4px dashed #555;
+  background-color: var(--surface-color);
 }
 </style>

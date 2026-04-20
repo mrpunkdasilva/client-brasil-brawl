@@ -137,44 +137,51 @@ onMounted(fetchProfile);
 
 <style scoped>
 .profile-container {
-  max-width: 400px;
-  margin: 0 auto;
-  background: white;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  max-width: 500px;
+  width: 100%;
+  margin: 2rem auto;
+  padding: 2.5rem;
+  background-color: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  box-shadow: var(--shadow-lg);
 }
 
 h2 {
   text-align: center;
-  margin-bottom: 25px;
-  color: #2c3e50;
+  margin-top: 0;
+  margin-bottom: 2rem;
+  color: var(--brazil-yellow);
+  font-size: 1.5rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .profile-form {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 1.5rem;
 }
 
 .avatar-section {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 10px;
+  gap: 1rem;
+  margin-bottom: 1rem;
 }
 
 .avatar-preview {
-  width: 120px;
-  height: 120px;
+  width: 140px;
+  height: 140px;
   border-radius: 50%;
   overflow: hidden;
-  border: 3px solid #42b983;
-  background: #f8f9fa;
+  border: 4px solid var(--brazil-green);
+  background: var(--bg-color);
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: var(--glow-green);
 }
 
 .avatar-preview img {
@@ -186,73 +193,49 @@ h2 {
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 0.5rem;
 }
 
 .form-group label {
-  font-weight: bold;
-  font-size: 0.9rem;
-  color: #666;
-}
-
-input {
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 1rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .disabled-input {
-  background: #f5f5f5;
-  color: #888;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary);
   cursor: not-allowed;
+  border-style: dashed;
 }
 
 .form-actions {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-top: 10px;
+  gap: 1rem;
+  margin-top: 1rem;
 }
 
-.primary-btn {
-  background: #42b983;
-  color: white;
-  border: none;
-  padding: 12px;
-  border-radius: 6px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.secondary-btn {
-  background: #e9ecef;
-  color: #495057;
-  border: 1px solid #ced4da;
-  padding: 6px 12px;
-  border-radius: 4px;
-  font-size: 0.8rem;
-  cursor: pointer;
+.form-actions button {
+  width: 100%;
 }
 
 .cancel-btn {
   background: transparent;
-  color: #666;
+  color: var(--text-secondary);
   border: none;
   padding: 8px;
   cursor: pointer;
-  text-decoration: underline;
+  text-decoration: none;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  transition: color 0.2s;
 }
 
-.error-msg {
-  color: #e74c3c;
-  font-size: 0.9rem;
-  text-align: center;
-}
-
-.success-msg {
-  color: #27ae60;
-  font-size: 0.9rem;
-  text-align: center;
+.cancel-btn:hover {
+  color: var(--text-primary);
 }
 </style>

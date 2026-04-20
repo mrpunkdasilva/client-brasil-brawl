@@ -3,8 +3,8 @@
     <div class="lobby-header">
       <h2>Sala de Espera - {{ socketState.onlineUsers.length }} online</h2>
       <div class="header-btns">
-        <button @click="createMatch" class="primary-btn">Criar Nova Partida</button>
-        <button @click="refreshOnlineList" class="secondary-btn">Atualizar Lista</button>
+        <button @click="createMatch" class="primary">Criar Nova Partida</button>
+        <button @click="refreshOnlineList" class="secondary">Atualizar Lista</button>
       </div>
     </div>
 
@@ -26,7 +26,7 @@
             <button
               @click="invitePlayer(user.userId)"
               v-if="currentMatchId && user.userId !== props.myUserId"
-              class="invite-btn"
+              class="invite-btn accent"
             >
               Desafiar!
             </button>
@@ -45,7 +45,7 @@
               <span><strong>{{ getSenderName(invite.fromUserId) }}</strong> te chamou pro pau!</span>
             </div>
             <div class="invite-actions">
-              <button @click="acceptInvite(invite.inviteId)" class="accept-btn">Aceitar</button>
+              <button @click="acceptInvite(invite.inviteId)" class="primary">Aceitar</button>
             </div>
           </li>
           <li v-if="socketState.invites.length === 0" class="empty-msg">
@@ -148,36 +148,188 @@ const acceptInvite = (inviteId) => {
 </script>
 
 <style scoped>
-.lobby-container { max-width: 1000px; margin: 0 auto; padding: 20px; color: #fff; }
-.lobby-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 2px solid #42b983; padding-bottom: 15px; }
-.header-btns { display: flex; gap: 10px; }
+.lobby-container {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+}
 
-.error-message { color: #ff4d4d; background: #330000; border: 1px solid #ff4d4d; border-radius: 6px; padding: 10px; margin-bottom: 20px; }
+.lobby-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding: 1.25rem;
+  background-color: var(--surface-color);
+  border: 3px solid black;
+  box-shadow: 4px 4px 0px 0px black;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
 
-.lists { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-.card { background: #1a1a1a; border: 1px solid #333; border-radius: 12px; padding: 20px; min-height: 300px; }
-h3 { margin-top: 0; color: #42b983; font-size: 1.2rem; margin-bottom: 20px; }
+@media (max-width: 768px) {
+  .lobby-header {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .header-btns {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
 
-ul { list-style: none; padding: 0; margin: 0; }
-li { padding: 12px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
-li:last-child { border-bottom: none; }
+  .lists {
+    grid-template-columns: 1fr !important;
+  }
+}
 
-.user-info { display: flex; align-items: center; gap: 10px; }
-.status-dot { width: 10px; height: 10px; background: #42b983; border-radius: 50%; box-shadow: 0 0 5px #42b983; flex-shrink: 0; }
-.user-avatar { width: 40px; height: 40px; border-radius: 6px; object-fit: cover; flex-shrink: 0; }
-.user-avatar-placeholder { width: 40px; height: 40px; border-radius: 6px; background: #333; flex-shrink: 0; }
-.user-details { display: flex; flex-direction: column; gap: 4px; }
-.me-tag { color: #888; font-size: 0.8rem; }
-.username { font-size: 1.1rem; }
+.lobby-header h2 {
+  font-size: 0.8rem;
+  color: var(--text-primary);
+  margin: 0;
+  flex: 1;
+  min-width: 200px;
+  letter-spacing: 2px;
+}
 
-.empty-msg { color: #666; font-style: italic; justify-content: center; padding: 40px 0; }
+.header-btns {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
 
-button { cursor: pointer; border-radius: 6px; border: none; font-weight: bold; transition: 0.2s; }
-.primary-btn { background: #42b983; color: #fff; padding: 10px 20px; }
-.secondary-btn { background: #333; color: #ccc; padding: 10px 20px; }
-.invite-btn { background: #ff9800; color: #fff; padding: 6px 12px; font-size: 0.9rem; }
-.accept-btn { background: #42b983; color: #fff; padding: 8px 16px; }
+.lists {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
 
-button:hover { filter: brightness(1.2); transform: translateY(-1px); }
-button:active { transform: translateY(0); }
+.card {
+  background: var(--surface-color);
+  border: 3px solid black;
+  padding: 1.5rem;
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 4px 4px 0px 0px black;
+  position: relative;
+  overflow: hidden;
+}
+
+h3 {
+  margin-top: 0;
+  color: var(--brazil-yellow);
+  font-size: 0.7rem;
+  margin-bottom: 1.5rem;
+  border-left: 8px solid var(--brazil-yellow);
+  padding-left: 10px;
+  letter-spacing: 2px;
+}
+
+li {
+  padding: 1rem;
+  border-bottom: 3px solid black;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  background-color: rgba(0,0,0,0.3);
+  transition: transform 0.1s;
+  position: relative;
+  z-index: 2;
+}
+
+li.is-me {
+  background-color: rgba(0, 155, 58, 0.2);
+  border: 3px solid var(--brazil-green);
+  box-shadow: inset 0 0 10px rgba(0, 155, 58, 0.3);
+  animation: mePulse 2s infinite ease-in-out;
+}
+
+@keyframes mePulse {
+  0% { border-color: var(--brazil-green); }
+  50% { border-color: var(--brazil-yellow); }
+  100% { border-color: var(--brazil-green); }
+}
+
+li.is-me .username {
+  color: var(--brazil-green);
+  text-shadow: 2px 2px 0px black;
+}
+
+li:hover {
+  transform: translateX(5px);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  background-color: var(--brazil-green);
+  box-shadow: 2px 2px 0px 0px black;
+  flex-shrink: 0;
+}
+
+.user-avatar, .user-avatar-placeholder {
+  width: 44px;
+  height: 44px;
+  border: 3px solid black;
+  flex-shrink: 0;
+  image-rendering: pixelated;
+  object-fit: cover;
+}
+
+.user-avatar-placeholder {
+  background-color: #555;
+}
+
+.user-details {
+  display: flex;
+  align-items: center;
+}
+
+.username {
+  font-size: 1.4rem;
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+  letter-spacing: 2px;
+}
+
+.me-tag {
+  color: var(--brazil-yellow);
+  font-family: var(--font-pixel);
+  font-size: 0.5rem;
+  margin-left: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.invite-btn {
+  padding: 10px 14px;
+  font-size: 0.5rem;
+  letter-spacing: 1px;
+}
+
+.empty-msg {
+  font-size: 1.4rem;
+  padding: 4rem 1rem;
+  font-family: var(--font-mono);
+  text-align: center;
+  color: var(--text-secondary);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+  letter-spacing: 2px;
+  position: relative;
+  z-index: 2;
+}
 </style>

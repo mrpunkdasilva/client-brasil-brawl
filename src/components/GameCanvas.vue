@@ -1,64 +1,76 @@
 <template>
   <div class="game-wrapper">
-    <div class="hud">
-      <div class="hud-left">
-        <div class="match-info">
-          <p class="match-id">Sala: {{ matchId }}</p>
-          <p class="match-status" :class="lastSnapshot?.status">
-            {{ lastSnapshot?.status === 'running' ? 'Em Progresso' : 
-               lastSnapshot?.status === 'countdown' ? 'Contagem Regressiva' : 
-               lastSnapshot?.status === 'waiting' ? 'Aguardando' : 'Finalizada' }}
-          </p>
+    <!-- HUD Layer -->
+    <div class="hud" v-if="!matchEnded">
+      <div class="hud-section left">
+        <div class="match-meta">
+          <span class="label">SALA:</span>
+          <span class="value">{{ matchId.slice(0, 8) }}...</span>
+        </div>
+        <div class="match-status" :class="lastSnapshot?.status">
+          {{ statusText }}
         </div>
       </div>
 
-      <div class="hud-center">
-        <div class="game-timer" :class="{ 'timer-low': (lastSnapshot?.remainingMs || 0) < 30000 }">
+      <div class="hud-section center">
+        <div class="game-timer" :class="{ 'timer-low': isTimerLow }">
           {{ formattedTime }}
         </div>
       </div>
 
-      <div class="hud-right">
-        <div v-if="myPlayer" class="player-stats">
-          <div class="stat-item">
-            <span class="stat-label">HP</span>
-            <div class="hp-bar-container">
-              <div class="hp-bar-fill" :style="{ width: myPlayer.hp + '%', backgroundColor: hpColor }"></div>
-              <span class="hp-text">{{ Math.ceil(myPlayer.hp) }}</span>
+      <div class="hud-section right">
+        <div v-if="myPlayer" class="player-vitals">
+          <div class="stat-group">
+            <span class="label">HP</span>
+            <div class="pixel-hp-bar">
+              <div class="hp-fill" :style="{ width: myPlayer.hp + '%', backgroundColor: hpColor }"></div>
+              <span class="hp-num">{{ Math.ceil(myPlayer.hp) }}</span>
             </div>
           </div>
-          <div class="stat-item">
-            <span class="stat-label">Placar</span>
-            <span class="stat-value">{{ myPlayer.score }}</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-label">Mortes</span>
-            <span class="stat-value">{{ myPlayer.deaths }}</span>
+          <div class="stat-meta">
+            <div class="meta-item">
+              <span class="label">PTS:</span>
+              <span class="value">{{ myPlayer.score }}</span>
+            </div>
+            <div class="meta-item">
+              <span class="label">KOs:</span>
+              <span class="value">{{ myPlayer.deaths }}</span>
+            </div>
           </div>
         </div>
-        <button @click="leaveMatch" class="leave-btn">Sair</button>
+        <button @click="leaveMatch" class="danger leave-btn">SAIR</button>
       </div>
     </div>
 
-    <!-- Scoreboard Overlay -->
-    <div class="scoreboard-mini" v-if="lastSnapshot?.players.length > 0">
+    <!-- Scoreboard Mini Overlay -->
+    <div class="scoreboard-mini" v-if="lastSnapshot?.players.length > 0 && !matchEnded">
+      <div class="score-header">RANKING</div>
       <div v-for="p in sortedPlayers" :key="p.playerId" class="score-row" :class="{ 'is-me': p.playerId === props.myUserId }">
         <span class="rank-name">{{ p.username }}</span>
         <span class="rank-score">{{ p.score }}</span>
       </div>
     </div>
 
-    <div v-if="matchEnded" class="end-screen">
-      <h2>Partida Finalizada!</h2>
-      <div class="winner-announcement" v-if="winnerName">
-        <p>VENCEDOR</p>
-        <h3>{{ winnerName }}</h3>
+    <!-- Final Result Overlay (Fixed Modal) -->
+    <div v-if="matchEnded" class="end-screen-overlay">
+      <div class="end-card pixel-border">
+        <h2>FIM DE JOGO</h2>
+        <div class="winner-section" v-if="winnerName">
+          <p class="winner-label">VENCEDOR</p>
+          <h3 class="winner-name">{{ winnerName }}</h3>
+        </div>
+        <div class="final-report" v-if="myPlayer">
+          <div class="report-item">
+            <span>SEU PLACAR:</span>
+            <span class="value">{{ myPlayer.score }}</span>
+          </div>
+          <div class="report-item">
+            <span>SUAS MORTES:</span>
+            <span class="value">{{ myPlayer.deaths }}</span>
+          </div>
+        </div>
+        <button class="primary return-btn" @click="leaveMatch">VOLTAR AO LOBBY</button>
       </div>
-      <div class="final-stats" v-if="myPlayer">
-        <p>Seu Placar: {{ myPlayer.score }}</p>
-        <p>Suas Mortes: {{ myPlayer.deaths }}</p>
-      </div>
-      <button @click="leaveMatch">Voltar ao Lobby</button>
     </div>
 
     <canvas 
@@ -70,7 +82,7 @@
       @mouseup="handleMouseUp"
     ></canvas>
     
-    <div class="controls-hint">WASD para mover | Mouse para mirar e atirar</div>
+    <div class="controls-hint" v-if="!matchEnded">WASD: MOVER | MOUSE: MIRAR E ATIRAR</div>
   </div>
 </template>
 
@@ -97,11 +109,21 @@ const sortedPlayers = computed(() => {
 });
 
 const hpColor = computed(() => {
-  if (!myPlayer.value) return '#00ff00';
+  if (!myPlayer.value) return 'var(--brazil-green)';
   const hp = myPlayer.value.hp;
-  if (hp > 50) return '#42b983';
-  if (hp > 25) return '#ffaa00';
+  if (hp > 50) return 'var(--brazil-green)';
+  if (hp > 25) return 'var(--brazil-yellow)';
   return '#ff4444';
+});
+
+const isTimerLow = computed(() => (lastSnapshot.value?.remainingMs || 0) < 30000);
+
+const statusText = computed(() => {
+  const status = lastSnapshot.value?.status;
+  if (status === 'running') return 'ARENA ABERTA';
+  if (status === 'countdown') return 'PREPARE-SE!';
+  if (status === 'waiting') return 'AGUARDANDO...';
+  return 'FINALIZADA';
 });
 
 const formattedTime = computed(() => {
@@ -124,36 +146,13 @@ const keys = { up: false, down: false, left: false, right: false };
 const mousePos = { x: 0, y: 0 };
 const isShooting = ref(false);
 const canShoot = ref(true);
-const hitPlayers = ref(new Set()); // Track players hit this frame
+const hitPlayers = ref(new Set());
 
 const imageCache = new Map();
-
-const lineCircleIntersection = (lineStart, lineEnd, circleCenter, circleRadius) => {
-  const dx = lineEnd.x - lineStart.x;
-  const dy = lineEnd.y - lineStart.y;
-  const fx = lineStart.x - circleCenter.x;
-  const fy = lineStart.y - circleCenter.y;
-
-  const a = dx * dx + dy * dy;
-  if (a === 0) return false; // Line start and end are the same
-
-  const b = 2 * (fx * dx + fy * dy);
-  const c = fx * fx + fy * fy - circleRadius * circleRadius;
-
-  const discriminant = b * b - 4 * a * c;
-  if (discriminant < 0) return false;
-
-  const sqrtD = Math.sqrt(discriminant);
-  const t1 = (-b - sqrtD) / (2 * a);
-  const t2 = (-b + sqrtD) / (2 * a);
-
-  return (t1 >= 0 && t1 <= 1) || (t2 >= 0 && t2 <= 1);
-};
 
 const getPlayerImage = (imageUrl) => {
   if (!imageUrl) return null;
   if (imageCache.has(imageUrl)) return imageCache.get(imageUrl);
-
   const img = new Image();
   img.src = imageUrl;
   imageCache.set(imageUrl, img);
@@ -175,6 +174,7 @@ const handleKeyUp = (e) => {
 };
 
 const handleMouseMove = (e) => {
+  if (!canvasRef.value) return;
   const rect = canvasRef.value.getBoundingClientRect();
   const scaleX = canvasRef.value.width / rect.width;
   const scaleY = canvasRef.value.height / rect.height;
@@ -216,17 +216,15 @@ const sendInput = () => {
       action: 'shoot',
       payload: { direction: angle }
     });
-    canShoot.value = false; // Prevents continuous shooting
+    canShoot.value = false;
   } else {
-    canShoot.value = true; // Allows shooting again
+    canShoot.value = true;
   }
 };
 
 const leaveMatch = () => {
   const socket = getSocket();
-  if (socket) {
-    socket.emit('match:leave', { matchId: props.matchId });
-  }
+  if (socket) socket.emit('match:leave', { matchId: props.matchId });
   emit('leave');
 };
 
@@ -235,45 +233,33 @@ const render = () => {
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
 
-  // Desenha fundo sempre
-  ctx.fillStyle = '#1a1a1a';
+  ctx.fillStyle = '#080c14';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   if (!lastSnapshot.value) {
     ctx.fillStyle = 'white';
-    ctx.font = '20px Arial';
+    ctx.font = '20px "Press Start 2P"';
     ctx.textAlign = 'center';
-    ctx.fillText('Aguardando snapshot do servidor...', canvas.width / 2, canvas.height / 2);
+    ctx.fillText('CONECTANDO À ARENA...', canvas.width / 2, canvas.height / 2);
     requestAnimationFrame(render);
     return;
   }
 
-  // Reset hit players each frame
   hitPlayers.value.clear();
-
-  // Detect collisions between projectiles and players (square collision)
-  const playerSize = 36; // Assuming square bounding box of 36x36 pixels
+  const playerSize = 36;
 
   lastSnapshot.value.projectiles.forEach(prj => {
     lastSnapshot.value.players.forEach(p => {
-      if (!p.isAlive) return;
-      if (p.playerId === prj.ownerPlayerId) return; // Don't hit self
-
-      // Check if projectile is within player's square bounding box
+      if (!p.isAlive || p.playerId === prj.ownerPlayerId) return;
       const halfSize = playerSize / 2;
-      const left = p.position.x - halfSize;
-      const right = p.position.x + halfSize;
-      const top = p.position.y - halfSize;
-      const bottom = p.position.y + halfSize;
-
-      if (prj.position.x >= left && prj.position.x <= right &&
-          prj.position.y >= top && prj.position.y <= bottom) {
+      if (prj.position.x >= p.position.x - halfSize && prj.position.x <= p.position.x + halfSize &&
+          prj.position.y >= p.position.y - halfSize && prj.position.y <= p.position.y + halfSize) {
         hitPlayers.value.add(p.playerId);
       }
     });
   });
 
-  // Projéteis
+  // Render Projectiles
   ctx.fillStyle = '#ffff00';
   lastSnapshot.value.projectiles.forEach(prj => {
     ctx.beginPath();
@@ -281,7 +267,7 @@ const render = () => {
     ctx.fill();
   });
 
-  // Jogadores
+  // Render Players
   lastSnapshot.value.players.forEach(p => {
     if (!p.isAlive) return;
     const isMe = p.playerId === props.myUserId;
@@ -304,36 +290,24 @@ const render = () => {
       ctx.strokeStyle = 'white';
       ctx.lineWidth = 2;
       ctx.stroke();
-
-      ctx.beginPath();
-      ctx.moveTo(0, 0);
-      ctx.lineTo(25 * scale, 0);
-      ctx.stroke();
     }
     ctx.restore();
 
+    // Player HUD on Canvas
     ctx.fillStyle = 'white';
-    ctx.font = 'bold 14px Arial';
+    ctx.font = '12px "VT323"';
     ctx.textAlign = 'center';
-    ctx.fillText(`${p.username}`, p.position.x, p.position.y - 55 * scale);
+    ctx.fillText(p.username, p.position.x, p.position.y - 45 * scale);
 
     ctx.fillStyle = '#333';
-    ctx.fillRect(p.position.x - 25 * scale, p.position.y - 35 * scale, 50 * scale, 6);
-    ctx.fillStyle = p.hp > 50 ? '#42b983' : p.hp > 25 ? '#ffaa00' : '#ff4444';
-    ctx.fillRect(p.position.x - 25 * scale, p.position.y - 35 * scale, (p.hp / 100) * 50 * scale, 6);
+    ctx.fillRect(p.position.x - 20 * scale, p.position.y - 35 * scale, 40 * scale, 4);
+    ctx.fillStyle = p.hp > 50 ? '#00ff00' : p.hp > 25 ? '#ffff00' : '#ff0000';
+    ctx.fillRect(p.position.x - 20 * scale, p.position.y - 35 * scale, (p.hp / 100) * 40 * scale, 4);
 
-    // Hit visualization - bright white circle around hit player
     if (hitPlayers.value.has(p.playerId)) {
-      ctx.strokeStyle = 'rgba(255, 255, 100, 0.9)';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.arc(p.position.x, p.position.y, 25 * scale, 0, Math.PI * 2);
-      ctx.stroke();
-
-      // Optional: add hit indicator text
-      ctx.fillStyle = 'rgba(255, 255, 100, 0.9)';
-      ctx.font = 'bold 12px Arial';
-      ctx.fillText('HIT!', p.position.x, p.position.y + 40 * scale);
+      ctx.strokeStyle = 'white';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(p.position.x - 25 * scale, p.position.y - 25 * scale, 50 * scale, 50 * scale);
     }
   });
 
@@ -341,24 +315,14 @@ const render = () => {
 };
 
 onMounted(() => {
-  console.log('GameCanvas Mounted. MyUserId:', props.myUserId, 'MatchId:', props.matchId);
   const socket = getSocket();
   if (socket) {
     socket.emit('match:join', { matchId: props.matchId });
     socket.on('match:snapshot', (snapshot) => {
-      console.log('Snapshot recebido:', snapshot);
       lastSnapshot.value = snapshot;
       if (snapshot.status === 'finished') matchEnded.value = true;
-      // Check if player has active projectile
-      const hasProjectile = snapshot.projectiles.some(prj => prj.ownerPlayerId === props.myUserId);
-      if (!hasProjectile) canShoot.value = true;
     });
-    socket.on('match:ended', () => {
-      matchEnded.value = true;
-    });
-    socket.on('match:player:joined', () => {
-      socket.emit('match:start', { matchId: props.matchId });
-    });
+    socket.on('match:ended', () => { matchEnded.value = true; });
   }
 
   window.addEventListener('keydown', handleKeyDown);
@@ -378,205 +342,141 @@ onUnmounted(() => {
 .game-wrapper {
   position: relative;
   width: 100%;
-  height: 100vh;
+  height: calc(100vh - 120px);
+  background-color: #000;
+  border: 4px solid black;
+  box-shadow: 8px 8px 0px 0px black;
   overflow: hidden;
+  margin-top: 10px;
 }
 
+/* HUD Re-Design */
 .hud {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
+  top: 0; left: 0; right: 0;
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding: 10px 20px;
-  background: rgba(0, 0, 0, 0.7);
-  color: white;
-  font-family: 'Arial', sans-serif;
-  z-index: 10;
+  padding: 1rem 2rem;
+  background: rgba(0, 0, 0, 0.8);
+  border-bottom: 4px solid black;
+  z-index: 50;
+  font-family: var(--font-pixel);
 }
 
-.hud-left {
-  display: flex;
-  align-items: center;
-}
-
-.match-info {
-  margin-right: 20px;
-}
-
-.match-id {
-  font-size: 18px;
-  margin: 0;
-}
-
-.match-status {
-  font-size: 14px;
-  margin: 0;
-}
-
-.hud-center {
-  flex-grow: 1;
-  text-align: center;
-}
-
-.game-timer {
-  font-size: 24px;
-  font-weight: bold;
-}
-
-.timer-low {
-  color: #ff4444;
-}
-
-.hud-right {
-  display: flex;
-  align-items: center;
-}
-
-.player-stats {
-  display: flex;
-  gap: 10px;
-  margin-right: 20px;
-}
-
-.stat-item {
+.hud-section {
   display: flex;
   flex-direction: column;
+  gap: 8px;
+}
+
+.hud-section.center {
   align-items: center;
+  justify-content: center;
 }
 
-.stat-label {
-  font-size: 12px;
-  color: #ccc;
+.hud-section.right {
+  align-items: flex-end;
 }
 
-.hp-bar-container {
-  width: 100px;
-  height: 8px;
+.label { color: var(--text-secondary); font-size: 0.5rem; margin-right: 5px; }
+.value { color: var(--text-primary); font-size: 0.6rem; }
+
+.match-status { font-size: 0.6rem; color: var(--brazil-green); }
+.game-timer { font-size: 1.5rem; color: var(--brazil-yellow); text-shadow: 3px 3px 0px black; }
+.timer-low { animation: pulse 0.5s infinite alternate; color: #ff4444; }
+
+@keyframes pulse { from { opacity: 1; } to { opacity: 0.4; } }
+
+.pixel-hp-bar {
+  width: 150px;
+  height: 20px;
   background: #333;
-  border-radius: 4px;
-  overflow: hidden;
+  border: 3px solid white;
   position: relative;
+  box-shadow: 3px 3px 0px black;
 }
 
-.hp-bar-fill {
-  height: 100%;
-  transition: width 0.2s;
+.hp-fill { height: 100%; transition: width 0.3s; }
+.hp-num {
+  position: absolute; width: 100%; text-align: center;
+  top: 50%; transform: translateY(-50%);
+  font-size: 0.5rem; color: white; text-shadow: 2px 2px 0px black;
 }
 
-.hp-text {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 10px;
-  color: white;
-}
+.stat-meta { display: flex; gap: 15px; margin-top: 5px; }
 
-.leave-btn {
-  padding: 8px 16px;
-  font-size: 14px;
-  color: white;
-  background: #e63946;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-
-.leave-btn:hover {
-  background: #d62839;
-}
-
-/* Scoreboard styles */
+/* Scoreboard Overlay */
 .scoreboard-mini {
   position: absolute;
-  top: 60px;
-  right: 20px;
-  width: 200px;
-  background: rgba(0, 0, 0, 0.8);
-  color: white;
-  border-radius: 8px;
-  overflow: hidden;
-  z-index: 10;
+  top: 100px; right: 20px;
+  width: 180px;
+  background: rgba(0,0,0,0.85);
+  border: 3px solid black;
+  padding: 0.75rem;
+  z-index: 40;
+  box-shadow: 4px 4px 0px black;
+}
+
+.score-header {
+  font-family: var(--font-pixel);
+  font-size: 0.6rem;
+  color: var(--brazil-yellow);
+  border-bottom: 2px solid #444;
+  padding-bottom: 5px;
+  margin-bottom: 8px;
 }
 
 .score-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 10px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex; justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 1.2rem;
+  padding: 2px 0;
 }
 
-.score-row:last-child {
-  border-bottom: none;
-}
+.score-row.is-me { color: var(--brazil-green); }
 
-.is-me {
-  font-weight: bold;
-  color: #00ccff;
-}
-
-/* End screen styles */
-.end-screen {
+/* End Screen Modal */
+.end-screen-overlay {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
+  background: rgba(0,0,0,0.9);
   display: flex;
-  flex-direction: column;
-  justify-content: center;
   align-items: center;
-  background: rgba(0, 0, 0, 0.9);
-  color: white;
-  font-family: 'Arial', sans-serif;
-  z-index: 20;
+  justify-content: center;
+  z-index: 100;
 }
 
-.winner-announcement {
-  margin-bottom: 20px;
-}
-
-.final-stats {
-  margin-bottom: 20px;
-}
-
-button {
-  padding: 10px 20px;
-  font-size: 16px;
-  color: white;
-  background: #007bff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-
-button:hover {
-  background: #0056b3;
-}
-
-/* Canvas styles */
-canvas {
-  display: block;
-  background: #1a1a1a;
-  max-width: 100%;
-  max-height: calc(100vh - 50px);
-  border: 1px solid #333;
-  margin: 0 auto;
-}
-
-/* Controls hint styles */
-.controls-hint {
-  position: absolute;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 14px;
-  color: #ccc;
+.end-card {
+  background: var(--surface-color);
+  padding: 3rem;
   text-align: center;
+  max-width: 500px;
+  width: 90%;
+}
+
+.end-card h2 { font-size: 1.5rem; margin-bottom: 2rem; }
+
+.winner-section { margin-bottom: 2rem; border: 3px solid var(--brazil-yellow); padding: 1.5rem; }
+.winner-label { font-family: var(--font-pixel); font-size: 0.6rem; color: var(--text-secondary); margin-bottom: 10px; }
+.winner-name { font-size: 2rem; color: var(--brazil-yellow); }
+
+.final-report {
+  display: flex; flex-direction: column; gap: 10px;
+  margin-bottom: 2.5rem;
+  font-family: var(--font-mono); font-size: 1.5rem;
+}
+
+.report-item { display: flex; justify-content: space-between; border-bottom: 1px solid #444; padding: 5px 0; }
+
+canvas {
+  width: 100%; height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.controls-hint {
+  position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+  font-family: var(--font-pixel); font-size: 0.5rem;
+  background: rgba(0,0,0,0.7); padding: 8px 15px; border: 2px solid white;
 }
 </style>

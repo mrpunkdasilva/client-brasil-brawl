@@ -75,16 +75,92 @@ const handleSubmit = async () => {
 </script>
 
 <style scoped>
-.character-create { max-width: 500px; margin: 20px auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background: #fff; }
-.field { margin-bottom: 20px; display: flex; flex-direction: column; text-align: left; }
-.field label { font-weight: bold; margin-bottom: 5px; }
-input { padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
-.preview { margin: 20px 0; }
-.preview img { width: 150px; height: 150px; object-fit: cover; border-radius: 8px; border: 2px solid #42b983; }
-.actions { display: flex; gap: 10px; justify-content: flex-end; }
-button { padding: 10px 20px; border-radius: 4px; cursor: pointer; border: none; font-weight: bold; }
-.save-btn { background: #42b983; color: white; }
-.cancel-btn { background: #eee; color: #333; }
-button:disabled { opacity: 0.5; cursor: not-allowed; }
-.error-message { color: red; margin-top: 10px; }
+.character-create {
+  max-width: 500px;
+  width: 100%;
+  margin: 2rem auto;
+  padding: 2.5rem;
+  background-color: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  box-shadow: var(--shadow-lg);
+}
+
+h3 {
+  margin-top: 0;
+  margin-bottom: 2rem;
+  color: var(--brazil-yellow);
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+.field {
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+label {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.preview {
+  margin: 2rem 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.preview p {
+  color: var(--text-secondary);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+}
+
+.preview img {
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 16px;
+  border: 3px solid var(--brazil-green);
+  box-shadow: var(--glow-green);
+}
+
+.actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.actions button {
+  flex: 1;
+}
+
+.cancel-btn {
+  background-color: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  box-shadow: none;
+}
+
+.cancel-btn:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: var(--text-secondary);
+  color: var(--text-primary);
+  box-shadow: none;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
 </style>

@@ -81,15 +81,53 @@ const handleSubmit = async () => {
 
 <style scoped>
 .auth-container {
-  max-width: 400px;
-  margin: 50px auto;
-  padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  background: #f9f9f9;
+  max-width: 350px; /* Reduced from 450px */
+  width: 100%;
+  margin: 1.5rem auto;
+  padding: 1.5rem; /* Reduced padding */
+  background-color: var(--surface-color);
+  border: 3px solid black;
+  box-shadow: 4px 4px 0px 0px black;
+  text-align: left;
 }
-.field { margin-bottom: 15px; display: flex; flex-direction: column; }
-input { padding: 8px; border-radius: 4px; border: 1px solid #ddd; }
-button { padding: 10px; background: #42b983; color: white; border: none; border-radius: 4px; cursor: pointer; }
-p { margin-top: 15px; cursor: pointer; color: #42b983; text-align: center; }
+
+h2 {
+  margin-top: 0;
+  margin-bottom: 2rem;
+  text-align: center;
+  color: var(--brazil-yellow);
+  font-size: 1rem; /* Better visibility for Press Start 2P */
+  line-height: 1.5;
+}
+
+.field {
+  margin-bottom: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+label {
+  font-size: 1.2rem; /* Readable VT323 size */
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  font-family: var(--font-mono);
+}
+
+button {
+  width: 100%;
+  margin-top: 0.75rem;
+  padding: 1rem;
+  font-size: 0.7rem; /* Balanced pixel font size */
+}
+
+p {
+  margin-top: 1.5rem;
+  cursor: pointer;
+  color: var(--text-secondary);
+  text-align: center;
+  font-size: 1.2rem; /* Clear mono font size */
+  font-family: var(--font-mono);
+}
 </style>

@@ -6,9 +6,9 @@
         <h1>Brasil Brawl</h1>
       </div>
       <div class="header-actions" v-if="user">
-        <button v-if="view === 'LOBBY'" @click="view = 'CHAR_CREATE'">Novo Lutador</button>
-        <button v-if="view === 'LOBBY'" @click="view = 'PROFILE'">Meu Perfil</button>
-        <button @click="logout">Sair</button>
+        <button class="primary" v-if="view === 'LOBBY'" @click="view = 'CHAR_CREATE'">Novo Lutador</button>
+        <button class="secondary" v-if="view === 'LOBBY'" @click="view = 'PROFILE'">Meu Perfil</button>
+        <button class="danger" @click="logout">Sair</button>
       </div>
     </header>
 
@@ -114,13 +114,57 @@ onMounted(() => {
 </script>
 
 <style>
-#app { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: #2c3e50; color: white; }
-header h1 { margin: 0; font-size: 1.5rem; }
-.logo-title { display: flex; align-items: center; gap: 15px; }
-.logo-img { width: 40px; height: 40px; }
-.header-actions { display: flex; gap: 10px; }
-main { padding: 20px; }
-button { cursor: pointer; padding: 8px 15px; border-radius: 4px; border: none; background: #42b983; color: white; font-weight: bold; }
-button:hover { background: #3aa876; }
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1.25rem; /* Reduced padding */
+  background-color: var(--surface-color);
+  border: 3px solid black;
+  margin-top: 5px;
+  box-shadow: 3px 3px 0px 0px black;
+  position: sticky;
+  top: 5px;
+  z-index: 100;
+}
+
+.logo-img {
+  width: 32px; /* Reduced from 48px */
+  height: 32px;
+  image-rendering: pixelated;
+}
+
+.header-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+main {
+  flex: 1;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  header {
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 1rem;
+    position: relative;
+    top: 0;
+  }
+  
+  .header-actions {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+}
 </style>
