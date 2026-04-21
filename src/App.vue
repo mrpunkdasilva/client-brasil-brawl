@@ -6,6 +6,7 @@
         <h1>Brasil Brawl</h1>
       </div>
       <div class="header-actions" v-if="user">
+        <button class="accent" v-if="view === 'LOBBY'" @click="navigateToRanking">Ranking</button>
         <button class="primary" v-if="view === 'LOBBY'" @click="view = 'CHAR_CREATE'">Novo Lutador</button>
         <button class="secondary" v-if="view === 'LOBBY'" @click="view = 'PROFILE'">Meu Perfil</button>
         <button class="danger" @click="logout">Sair</button>
@@ -23,6 +24,11 @@
         v-else-if="view === 'LOBBY'" 
         :myUserId="user?.id" 
         @match-joined="handleMatchJoined" 
+      />
+
+      <Ranking 
+        v-else-if="view === 'RANKING'" 
+        @close="navigateToLobby" 
       />
 
       <CharacterCreate 
@@ -61,6 +67,7 @@ import CharacterSelect from './components/CharacterSelect.vue';
 import CharacterCreate from './components/CharacterCreate.vue';
 import GameCanvas from './components/GameCanvas.vue';
 import Profile from './components/Profile.vue';
+import Ranking from './components/Ranking.vue';
 import { connectSocket, disconnectSocket } from './socket';
 import { getAuthSession, clearAuthSession } from './utils/storage.js';
 
@@ -93,6 +100,8 @@ if (authSession && authSession.accessToken) {
     if (path.startsWith('/match/')) {
       matchId.value = path.split('/')[2];
       view.value = 'CHAR_SELECT';
+    } else if (path === '/ranking') {
+      view.value = 'RANKING';
     } else {
       view.value = 'LOBBY';
     }
@@ -122,8 +131,17 @@ const handleMatchJoined = (id) => {
 };
 
 const handleCharacterCreated = () => {
+  navigateToLobby();
+};
+
+const navigateToLobby = () => {
   view.value = 'LOBBY';
   window.history.pushState({}, '', '/lobby');
+};
+
+const navigateToRanking = () => {
+  view.value = 'RANKING';
+  window.history.pushState({}, '', '/ranking');
 };
 
 const logout = () => {
@@ -148,6 +166,7 @@ onMounted(() => {
     const path = window.location.pathname;
     if (path === '/login') view.value = 'AUTH';
     else if (path === '/lobby') view.value = 'LOBBY';
+    else if (path === '/ranking') view.value = 'RANKING';
     else if (path.startsWith('/match/')) {
       matchId.value = path.split('/')[2];
       view.value = 'CHAR_SELECT';

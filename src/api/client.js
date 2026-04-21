@@ -46,6 +46,7 @@ export const matchApi = {
 
 export const userApi = {
   getProfile: () => api.get('/users/me'),
+  getRanking: () => api.get('/users/ranking'),
   updateProfile: (formData) => api.patch('/users/me', formData, {
     headers: { 'Content-Type': 'multipart/form-data' }
   }),
