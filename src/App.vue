@@ -13,7 +13,11 @@
     </header>
 
     <main>
-      <AuthForm v-if="view === 'AUTH'" @auth-success="handleAuthSuccess" />
+      <div v-if="view === 'LOADING'" class="loading-screen">
+        <h2>CARREGANDO...</h2>
+      </div>
+
+      <AuthForm v-else-if="view === 'AUTH'" @auth-success="handleAuthSuccess" />
       
       <Lobby 
         v-else-if="view === 'LOBBY'" 
@@ -60,7 +64,7 @@ import Profile from './components/Profile.vue';
 import { connectSocket, disconnectSocket } from './socket';
 import { getAuthSession, clearAuthSession } from './utils/storage.js';
 
-const view = ref('AUTH');
+const view = ref('LOADING');
 const user = ref(null);
 const matchId = ref(null);
 
@@ -76,6 +80,28 @@ const parseJwt = (token) => {
     return null;
   }
 };
+
+// Immediate state initialization to prevent flashing
+const authSession = getAuthSession();
+if (authSession && authSession.accessToken) {
+  const payload = parseJwt(authSession.accessToken);
+  if (payload) {
+    user.value = { id: payload.sub, username: payload.name };
+    connectSocket(authSession.accessToken);
+
+    const path = window.location.pathname;
+    if (path.startsWith('/match/')) {
+      matchId.value = path.split('/')[2];
+      view.value = 'CHAR_SELECT';
+    } else {
+      view.value = 'LOBBY';
+    }
+  } else {
+    view.value = 'AUTH';
+  }
+} else {
+  view.value = 'AUTH';
+}
 
 const handleAuthSuccess = (token) => {
   const payload = parseJwt(token);
@@ -109,27 +135,12 @@ const logout = () => {
 };
 
 onMounted(() => {
-  // Try to restore session from secure storage
-  const authSession = getAuthSession();
-  if (authSession && authSession.accessToken) {
-    const payload = parseJwt(authSession.accessToken);
-    user.value = { id: payload.sub, username: payload.name };
-    connectSocket(authSession.accessToken);
-
-    // Deep linking logic
-    const path = window.location.pathname;
-    if (path.startsWith('/match/')) {
-      matchId.value = path.split('/')[2];
-      view.value = 'CHAR_SELECT'; // Go to selection first!
-    } else if (path === '/lobby') {
-      view.value = 'LOBBY';
-    } else {
-      view.value = 'LOBBY';
-      window.history.replaceState({}, '', '/lobby');
-    }
-  } else {
-    view.value = 'AUTH';
+  // Sync URL state if necessary
+  const path = window.location.pathname;
+  if (view.value === 'AUTH' && path !== '/login') {
     window.history.replaceState({}, '', '/login');
+  } else if (view.value === 'LOBBY' && (path === '/' || path === '')) {
+    window.history.replaceState({}, '', '/lobby');
   }
 
   // Handle browser back/forward buttons
@@ -139,7 +150,7 @@ onMounted(() => {
     else if (path === '/lobby') view.value = 'LOBBY';
     else if (path.startsWith('/match/')) {
       matchId.value = path.split('/')[2];
-      view.value = 'ARENA';
+      view.value = 'CHAR_SELECT';
     }
   };
 });
@@ -150,7 +161,7 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.75rem 1.25rem; /* Reduced padding */
+  padding: 0.75rem 1.25rem;
   background-color: var(--surface-color);
   border: 3px solid black;
   margin-top: 5px;
@@ -161,7 +172,7 @@ header {
 }
 
 .logo-img {
-  width: 32px; /* Reduced from 48px */
+  width: 32px;
   height: 32px;
   image-rendering: pixelated;
 }
@@ -181,6 +192,13 @@ main {
   margin: 0 auto;
   width: 100%;
   box-sizing: border-box;
+}
+
+.loading-screen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 60vh;
 }
 
 @media (max-width: 768px) {
