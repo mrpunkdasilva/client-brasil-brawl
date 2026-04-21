@@ -42,6 +42,25 @@
         />
       </div>
 
+      <!-- Statistics Section -->
+      <div v-if="userProfile.stats" class="stats-section">
+        <h3>Estatísticas de Combate</h3>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <span class="stat-label">VITÓRIAS</span>
+            <span class="stat-value wins">{{ userProfile.stats.wins }}</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">DERROTAS</span>
+            <span class="stat-value losses">{{ userProfile.stats.losses }}</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">KILLS</span>
+            <span class="stat-value kills">{{ userProfile.stats.totalKills }}</span>
+          </div>
+        </div>
+      </div>
+
       <div class="form-actions">
         <button type="submit" :disabled="loading" class="primary-btn">
           {{ loading ? 'Salvando...' : 'Salvar Alterações' }}
@@ -238,4 +257,50 @@ h2 {
 .cancel-btn:hover {
   color: var(--text-primary);
 }
+
+.stats-section {
+  margin-top: 1rem;
+  padding-top: 1.5rem;
+  border-top: 3px solid black;
+}
+
+.stats-section h3 {
+  font-family: var(--font-pixel);
+  font-size: 0.8rem;
+  color: var(--brazil-yellow);
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.stat-card {
+  background-color: rgba(0, 0, 0, 0.3);
+  border: 3px solid black;
+  padding: 10px;
+  text-align: center;
+  box-shadow: 2px 2px 0px black;
+}
+
+.stat-label {
+  display: block;
+  font-family: var(--font-pixel);
+  font-size: 0.4rem;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.stat-value {
+  display: block;
+  font-family: var(--font-pixel);
+  font-size: 0.9rem;
+}
+
+.stat-value.wins { color: var(--brazil-green); }
+.stat-value.losses { color: var(--danger); }
+.stat-value.kills { color: var(--brazil-yellow); }
 </style>
