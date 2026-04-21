@@ -254,19 +254,19 @@ const render = () => {
     return;
   }
 
-  hitPlayers.value.clear();
-  const playerSize = 36;
+   hitPlayers.value.clear();
+   const playerSize = 50;
 
-  lastSnapshot.value.projectiles.forEach(prj => {
-    lastSnapshot.value.players.forEach(p => {
-      if (!p.isAlive || p.playerId === prj.ownerPlayerId) return;
-      const halfSize = playerSize / 2;
-      if (prj.position.x >= p.position.x - halfSize && prj.position.x <= p.position.x + halfSize &&
-          prj.position.y >= p.position.y - halfSize && prj.position.y <= p.position.y + halfSize) {
-        hitPlayers.value.add(p.playerId);
-      }
-    });
-  });
+   lastSnapshot.value.projectiles.forEach(prj => {
+     lastSnapshot.value.players.forEach(p => {
+       if (!p.isAlive || p.playerId === prj.ownerPlayerId) return;
+       const halfSize = playerSize / 2;
+       if (prj.position.x >= p.position.x - halfSize && prj.position.x <= p.position.x + halfSize &&
+           prj.position.y >= p.position.y - halfSize && prj.position.y <= p.position.y + halfSize) {
+         hitPlayers.value.add(p.playerId);
+       }
+     });
+   });
 
   // Render Projectiles
   ctx.fillStyle = '#ffff00';
@@ -288,18 +288,18 @@ const render = () => {
     ctx.translate(p.position.x, p.position.y);
     ctx.rotate(p.direction);
 
-    if (img && img.complete) {
-      const size = 50 * scale;
-      ctx.drawImage(img, -size / 2, -size / 2, size, size);
-    } else {
-      ctx.fillStyle = isMe ? '#00ccff' : '#ff3333';
-      ctx.beginPath();
-      ctx.arc(0, 0, 18 * scale, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.strokeStyle = 'white';
-      ctx.lineWidth = 2;
-      ctx.stroke();
-    }
+     if (img && img.complete) {
+       const size = 70 * scale;
+       ctx.drawImage(img, -size / 2, -size / 2, size, size);
+     } else {
+       ctx.fillStyle = isMe ? '#00ccff' : '#ff3333';
+       ctx.beginPath();
+       ctx.arc(0, 0, 25 * scale, 0, Math.PI * 2);
+       ctx.fill();
+       ctx.strokeStyle = 'white';
+       ctx.lineWidth = 2;
+       ctx.stroke();
+     }
     ctx.restore();
 
     // Player HUD on Canvas
